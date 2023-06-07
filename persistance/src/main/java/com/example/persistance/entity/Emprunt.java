@@ -10,9 +10,9 @@ import java.util.Date;
 @Data
 public class Emprunt {
     @Id
-    private Long id;
+    private String id;
 
-    private Long LivreId;
+    private String idLivre;
 
     private Date date_emprunt;
 

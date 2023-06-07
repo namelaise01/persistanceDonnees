@@ -1,6 +1,10 @@
 package com.example.persistance.entity;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
@@ -8,9 +12,11 @@ import java.util.Date;
 
 @Document
 @Data
+@ToString(callSuper = true)
 public class Livre {
 
-    private Long id;
+    @Id
+    private String id;
 
     private String titre;
 
@@ -18,7 +24,10 @@ public class Livre {
 
     private int nombre_de_pages;
 
-    private int categorieId;
+    private String categorieId;
 
+    private boolean disable = false;
+
+    private boolean available = true;
 
 }

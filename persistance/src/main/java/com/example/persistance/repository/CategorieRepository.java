@@ -5,7 +5,11 @@ import com.example.persistance.entity.Livre;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CategorieRepository extends CrudRepository<Categorie,Long > {
     List<Categorie> findAll();
+
+    Optional<Categorie> findById(String id);
+
 }

@@ -10,8 +10,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Data
 public class Categorie {
     @Id
-    private ObjectId id;
+    private String id;
 
     private String nom;
+
+    private boolean active = true;
 
 }

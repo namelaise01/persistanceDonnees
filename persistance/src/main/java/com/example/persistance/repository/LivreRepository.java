@@ -13,5 +13,9 @@ public interface LivreRepository extends CrudRepository<Livre,Long > {
 
     List<Livre> findAllByDisable(boolean isDisabled);
 
+    List<Livre> findAllByDisableAndAvailable(boolean isDisabled, boolean isAvailable);
+
     Optional<Livre> findById(String id);
+
+    Optional<Livre> findByAuteurId(String id);
 }

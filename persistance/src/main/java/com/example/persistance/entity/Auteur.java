@@ -12,7 +12,6 @@ public class Auteur {
     @Id
     private String id;
 
-    private String idLivre;
 
     private String nom;
 

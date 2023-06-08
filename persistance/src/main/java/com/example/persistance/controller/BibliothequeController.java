@@ -5,6 +5,7 @@ import com.example.persistance.entity.Categorie;
 import com.example.persistance.entity.Emprunt;
 import com.example.persistance.entity.Livre;
 import com.example.persistance.repository.*;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.ui.Model;
@@ -42,6 +43,7 @@ public class BibliothequeController {
         return livre;
     }
 
+
     @PostMapping(path = "/deleteLivre")
     @ResponseBody
     public void deleteLivre(@RequestParam String id) {
@@ -51,12 +53,20 @@ public class BibliothequeController {
         livreRepository.save(livre);
     }
 
+    @GetMapping(path = "/getLivreByAuteur")
+    @ResponseBody
+    public Livre getLivreByAuteur(@RequestParam String auteurId) {
+        Optional<Livre> livreOptional = livreRepository.findByAuteurId(auteurId);
+        Livre livre = livreOptional.isPresent() ? livreOptional.get() : null;
+        return livre;
+    }
+
     @PostMapping(path = "/deleteCategorie")
     public void disableCategorie( @RequestParam String id ) {
         if (empruntRepository.count() ==0 ){
             return ;
         }
-        Optional<Categorie> categorieOptional = categorieRepository.findById(Long.valueOf(id));
+        Optional<Categorie> categorieOptional = categorieRepository.findById(new ObjectId(id));
         Categorie categorie = categorieOptional.isPresent() ? categorieOptional.get() : null;
         categorie.setActive(false);
         categorieRepository.save(categorie);
@@ -86,17 +96,37 @@ public class BibliothequeController {
     @GetMapping(path = "/getAllLivre")
     public   List<Livre>  getAllLivre() {
         List<Livre> allLivre = livreRepository.findAllByDisable(false);
-        if (allLivre.isEmpty()) {return null;}
+        Iterator<Livre> iterator = allLivre.iterator();
 
-        allLivre.forEach(livre -> {
+
+        while (iterator.hasNext()) {
+            Livre livre = iterator.next();
             String categorieId = livre.getCategorieId();
-            Optional<Categorie> categorie = categorieRepository.findById(categorieId);
+            Optional<Categorie> categorie = categorieRepository.findById(new ObjectId(categorieId));
+
             if (categorie.isPresent() && !categorie.get().isActive()) {
-                allLivre.remove(livre);
+                iterator.remove();
             }
-        });
+        }
         return allLivre;
     }
+
+    @GetMapping(path = "/getAllLivreEmprunt")
+    public   List<Livre>  getAllLivreEmprunt() {
+        List<Livre> allLivre = livreRepository.findAllByDisableAndAvailable(false, false);
+        Iterator<Livre> iterator = allLivre.iterator();
+
+        while (iterator.hasNext()) {
+            Livre livre = iterator.next();
+            String categorieId = livre.getCategorieId();
+            Optional<Categorie> categorie = categorieRepository.findById(new ObjectId(categorieId));
+            if (categorie.isPresent() && !categorie.get().isActive()) {
+                iterator.remove();
+            }
+        }
+        return allLivre;
+    }
+
 
     @GetMapping(path = "/getCategories")
     public List<Categorie> getCategories() {
@@ -104,6 +134,11 @@ public class BibliothequeController {
         return allCategories;
     }
 
+    @GetMapping(path = "/getAuteurs")
+    public List<Auteur> getAuteurs() {
+        List<Auteur> allAuteurs = auteurRepository.findAll();
+        return allAuteurs;
+    }
     @GetMapping(path = "/nbEmprunt")
     public int getNbEmprunt( @RequestParam String id ) {
         if (empruntRepository.count() ==0 ){
@@ -111,6 +146,14 @@ public class BibliothequeController {
         }
         List<Emprunt> empruntList = empruntRepository.findAllByIdLivre(id);
         return empruntList.size();
+    }
+
+    @GetMapping(path = "/getAuteurById")
+    @ResponseBody
+    public Livre getAuteurById( @RequestParam String auteurId ) {
+        Optional<Livre> livreOptional = livreRepository.findByAuteurId(auteurId);
+        Livre livre =  livreOptional.isPresent() ? livreOptional.get() : null;
+        return livre;
     }
     @PostMapping(value = "/addLivre")
     @ResponseBody
@@ -129,7 +172,7 @@ public class BibliothequeController {
     @PostMapping(value = "/addAuteur")
     public void postAuteur(@RequestBody  Auteur auteur ) {
         Auteur newAuteur = new Auteur();
-        newAuteur.setIdLivre(auteur.getIdLivre());
+       // newAuteur.setIdLivre(auteur.getIdLivre());
         newAuteur.setNom(auteur.getNom());
          newAuteur.setPrenom(auteur.getPrenom());
          auteurRepository.save(newAuteur);}

@@ -26,6 +26,8 @@ public class Livre {
 
     private String categorieId;
 
+    private String auteurId;
+
     private boolean disable = false;
 
     private boolean available = true;
